@@ -7,22 +7,10 @@ main =
 
 
 view model =
-  div [ class "navbar navbar-inverse"]
-    [ div [ class "container-fluid" ]
-      [ div [ class "navbar-header" ]
-          [ button
-              [ class "collapsed navbar-toggle"
-              , attribute "type" "button"
-              , attribute "data-toggle" "collapse"
-              , attribute "data-target" ".bs-example-js-navbar-collapse"
-              ]
-              [
-                span [ class "sr-only" ] [ text "Toggle navigation" ]
-              ]
-          ]
-      ]
+  table []
+    [ tr [] [ th [] [ text "year"], th [] [text "federal income tax paid" ] ]
+    , tr [] [ td [] [ input [] [] ], td [] [ input [] [] ] ]
     ]
-
 
 type Msg = Increment | Decrement
 
