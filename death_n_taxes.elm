@@ -11,6 +11,8 @@ view model =
     [ tr [] [ th [] [ text "year"], th [] [text "federal income tax paid" ] ]
     , tr [] [ td [] [ input [] [] ], td [] [ input [] [] ] ]
     ]
+  button [] [ text "+" ]
+  p [] [ text "these are the stats: 21%" ]
 
 type Msg = Increment | Decrement
 
