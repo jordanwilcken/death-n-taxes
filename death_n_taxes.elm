@@ -6,44 +6,58 @@ import List exposing(..)
 main =
   beginnerProgram { model = model, view = view, update = update }
 
-type alias Model = { years: (List Int) }
+type alias Model =
+  { dataPoints : DataPoints
+  , statistics : String
+  }
+
+type alias DataPoints = List TaxDataPoint
+
+type alias TaxDataPoint = { year : Int, taxPaid : Float }
 
 model =
-  Model [2007]
+  Model [] ""
 
 view model =
   div []
-    [ table [] (makeTableRows makeHeader makeRows model.years)
+    [ table [] makeRows
     , button [] [ text "+" ]
     , p [] [ text "these are the stats: 21%" ]
     ]
 
-row : Int -> Html msg
-row year =
-  tr [] [ td[] [ input [value (toString year)] [] ], td [] [ input [] [ ] ] ]
+makeRows : List (Html msg)
+makeRows =
+  makeTableRows makeHeaderRow makeTaxRows model.dataPoints makeBlankRow
 
-makeTableRows : Html msg -> ((List Int) -> (List (Html msg))) -> List Int -> (List (Html msg))
-makeTableRows makeHeaderFun makeRowsFun years=
-  makeHeaderFun :: makeRowsFun years
+makeTableRows : Html msg -> (DataPoints -> (List (Html msg))) -> DataPoints -> Html msg -> List (Html msg)
+makeTableRows makeHeaderFun makeTaxRowsFun dataPoints makeBlankRow =
+  List.append (makeHeaderFun :: makeTaxRowsFun dataPoints) (List.singleton makeBlankRow)
   
-makeHeader : Html msg
-makeHeader =
+makeHeaderRow : Html msg
+makeHeaderRow =
   tr [] [ th [] [ text "year"], th [] [text "federal income tax paid" ] ]
    
-makeRows : (List Int) -> List (Html msg)
-makeRows years =
-  List.map (\year -> makeOneRow year) years
+makeTaxRows : DataPoints -> List (Html msg)
+makeTaxRows dataPoints =
+  List.map (\dataPoint -> makeOneRow (Just dataPoint)) dataPoints
 
-makeOneRow : Int -> Html msg
-makeOneRow year =
-  tr [] [ td [] [ input [] [] ], td [] [ input [] [] ] ]
+makeBlankRow : Html msg
+makeBlankRow = makeOneRow Nothing
+
+makeOneRow : (Maybe TaxDataPoint) -> Html msg
+makeOneRow maybeData =
+  case maybeData of
+    Just dataPoint ->
+      tr [] [ td [] [ input [value (toString dataPoint.year)] [] ], td [] [ input [] [] ] ]
+    Nothing ->
+      tr [] [ td [] [ input [] [] ] , td [] [ input [] [] ] ]
 
 type Msg = Increment | Decrement
 
 update msg model =
   case msg of
     Increment ->
-      { model | years = 1 :: model.years }
+      model
 
     Decrement ->
-      { model | years = 1 :: model.years }
+      model
