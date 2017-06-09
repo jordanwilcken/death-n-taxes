@@ -8,6 +8,7 @@ main =
 
 type alias Model =
   { dataPoints : DataPoints
+  , entries : List Entry
   , stats : String
   }
 
@@ -15,8 +16,10 @@ type alias DataPoints = List TaxDataPoint
 
 type alias TaxDataPoint = { year : Int, taxPaid : Float }
 
+type alias Entry = { year : String, taxPaid : String }
+
 model =
-  Model [] "we don't have no stats yet"
+  Model [] [] "we don't have no stats yet"
 
 view model =
   div []
