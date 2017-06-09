@@ -1,5 +1,5 @@
 import Html exposing (..)
-import Html.Events exposing (onClick)
+import Html.Events
 import Html.Attributes exposing (..)
 import List exposing(..)
 
@@ -8,7 +8,7 @@ main =
 
 type alias Model =
   { dataPoints : DataPoints
-  , statistics : String
+  , stats : String
   }
 
 type alias DataPoints = List TaxDataPoint
@@ -16,48 +16,64 @@ type alias DataPoints = List TaxDataPoint
 type alias TaxDataPoint = { year : Int, taxPaid : Float }
 
 model =
-  Model [] ""
+  Model [] "we don't have no stats yet"
 
 view model =
   div []
-    [ table [] makeRows
-    , button [] [ text "+" ]
-    , p [] [ text "these are the stats: 21%" ]
+    [ table [] (makeRows model.dataPoints)
+    --, button [] [ text "+" ]
+    , p [] [ text model.stats ]
     ]
 
-makeRows : List (Html msg)
-makeRows =
-  makeTableRows makeHeaderRow makeTaxRows model.dataPoints makeBlankRow
+makeRows : DataPoints -> List (Html Msg)
+makeRows dataPoints =
+  makeTableRows makeHeaderRow makeBlankRow (makeTaxRows dataPoints)
 
-makeTableRows : Html msg -> (DataPoints -> (List (Html msg))) -> DataPoints -> Html msg -> List (Html msg)
-makeTableRows makeHeaderFun makeTaxRowsFun dataPoints makeBlankRow =
-  List.append (makeHeaderFun :: makeTaxRowsFun dataPoints) (List.singleton makeBlankRow)
+makeTableRows : Html msg -> Html msg -> List (Html msg) ->  List (Html msg)
+makeTableRows headerRow blankRow taxRows =
+  List.append (headerRow :: taxRows) (List.singleton blankRow)
   
+makeTaxRows : DataPoints -> List (Html Msg)
+makeTaxRows dataPoints =
+  List.map (\dataPoint -> makeOneRow (Just dataPoint)) dataPoints
+
 makeHeaderRow : Html msg
 makeHeaderRow =
   tr [] [ th [] [ text "year"], th [] [text "federal income tax paid" ] ]
    
-makeTaxRows : DataPoints -> List (Html msg)
-makeTaxRows dataPoints =
-  List.map (\dataPoint -> makeOneRow (Just dataPoint)) dataPoints
-
-makeBlankRow : Html msg
+makeBlankRow : Html Msg
 makeBlankRow = makeOneRow Nothing
 
-makeOneRow : (Maybe TaxDataPoint) -> Html msg
+makeOneRow : (Maybe TaxDataPoint) -> Html Msg
 makeOneRow maybeData =
   case maybeData of
     Just dataPoint ->
-      tr [] [ td [] [ input [value (toString dataPoint.year)] [] ], td [] [ input [] [] ] ]
+      tr []
+        [ td [] [ input [value (toString dataPoint.year)] [] ]
+        , td []
+            [ input
+                [ type_ "number"
+                , value (toString dataPoint.taxPaid)
+                , Html.Events.onInput AmountChanged
+                ] []
+            ]
+        ]
     Nothing ->
-      tr [] [ td [] [ input [] [] ] , td [] [ input [] [] ] ]
+      tr []
+        [ td [] [ input [ Html.Events.onInput YearEntered] [] ]
+        , td [] [ input [ Html.Events.onInput TaxesEntered] [] ]
+        ]
 
-type Msg = Increment | Decrement
+type Msg =
+  AmountChanged String
+  | YearEntered String
+  | TaxesEntered String
 
 update msg model =
   case msg of
-    Increment ->
+    AmountChanged newAmount ->
+       { model | stats = "boring stats" }
+    YearEntered year ->
       model
-
-    Decrement ->
+    TaxesEntered amount ->
       model
