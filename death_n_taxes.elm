@@ -7,8 +7,7 @@ main =
   beginnerProgram { model = model, view = view, update = update }
 
 type alias Model =
-  { dataPoints : DataPoints
-  , entries : List Entry
+  { entries : List Entry
   , stats : String
   }
 
@@ -20,7 +19,6 @@ type alias Entry = { year : String, taxPaid : String }
 
 model =
   Model
-    []
     [ Entry "" ""
     , Entry "" ""
     , Entry "" ""
