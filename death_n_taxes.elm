@@ -19,64 +19,63 @@ type alias TaxDataPoint = { year : Int, taxPaid : Float }
 type alias Entry = { year : String, taxPaid : String }
 
 model =
-  Model [] [] "we don't have no stats yet"
+  Model
+    []
+    [ Entry "" ""
+    , Entry "" ""
+    , Entry "" ""
+    , Entry "" ""
+    , Entry "" ""
+    ]
+    "we don't have no stats yet"
 
 view model =
   div []
-    [ table [] (makeRows model.dataPoints)
-    --, button [] [ text "+" ]
+    [ table [] (makeRows model.entries)
     , p [] [ text model.stats ]
     ]
 
-makeRows : DataPoints -> List (Html Msg)
-makeRows dataPoints =
-  makeTableRows makeHeaderRow makeBlankRow (makeTaxRows dataPoints)
+makeRows : List Entry -> List (Html Msg)
+makeRows entries =
+  makeTableRows makeHeaderRow (makeTaxRows entries)
 
-makeTableRows : Html msg -> Html msg -> List (Html msg) ->  List (Html msg)
-makeTableRows headerRow blankRow taxRows =
-  List.append (headerRow :: taxRows) (List.singleton blankRow)
+makeTableRows : Html msg -> List (Html msg) -> List (Html msg)
+makeTableRows headerRow taxRows =
+  headerRow :: taxRows
   
-makeTaxRows : DataPoints -> List (Html Msg)
-makeTaxRows dataPoints =
-  List.map (\dataPoint -> makeOneRow (Just dataPoint)) dataPoints
+makeTaxRows : List Entry -> List (Html Msg)
+makeTaxRows entries =
+  List.map makeOneRow entries
 
 makeHeaderRow : Html msg
 makeHeaderRow =
   tr [] [ th [] [ text "year"], th [] [text "federal income tax paid" ] ]
    
-makeBlankRow : Html Msg
-makeBlankRow = makeOneRow Nothing
-
-makeOneRow : (Maybe TaxDataPoint) -> Html Msg
-makeOneRow maybeData =
-  case maybeData of
-    Just dataPoint ->
-      tr []
-        [ td [] [ input [value (toString dataPoint.year)] [] ]
-        , td []
-            [ input
-                [ type_ "number"
-                , value (toString dataPoint.taxPaid)
-                , Html.Events.onInput AmountChanged
-                ] []
-            ]
+makeOneRow : Entry -> Html Msg
+makeOneRow entry =
+  tr []
+    [ td []
+        [ input
+            [ type_ "number"
+            , value entry.year
+            , Html.Events.onInput YearChanged
+            ] [] ]
+    , td []
+        [ input
+            [ type_ "number"
+            , value entry.taxPaid
+            , Html.Events.onInput AmountChanged
+            ] []
         ]
-    Nothing ->
-      tr []
-        [ td [] [ input [ Html.Events.onInput YearEntered] [] ]
-        , td [] [ input [ Html.Events.onInput TaxesEntered] [] ]
-        ]
+    ]
 
 type Msg =
-  AmountChanged String
-  | YearEntered String
-  | TaxesEntered String
+  YearChanged String
+  | AmountChanged String
 
 update msg model =
   case msg of
-    AmountChanged newAmount ->
-       { model | stats = "boring stats" }
-    YearEntered year ->
+    YearChanged inputValue ->
       model
-    TaxesEntered amount ->
+    AmountChanged inputValue ->
       model
