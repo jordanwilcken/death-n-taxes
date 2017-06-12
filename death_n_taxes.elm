@@ -15,15 +15,15 @@ type alias DataPoints = List TaxDataPoint
 
 type alias TaxDataPoint = { year : Int, taxPaid : Float }
 
-type alias Entry = { year : String, taxPaid : String }
+type alias Entry = { id: Int, year : String, taxPaid : String }
 
 model =
   Model
-    [ Entry "" ""
-    , Entry "" ""
-    , Entry "" ""
-    , Entry "" ""
-    , Entry "" ""
+    [ Entry 1 "" ""
+    , Entry 2 "" ""
+    , Entry 3 "" ""
+    , Entry 4 "" ""
+    , Entry 5 "" ""
     ]
     "we don't have no stats yet"
 
@@ -56,24 +56,49 @@ makeOneRow entry =
         [ input
             [ type_ "number"
             , value entry.year
-            , Html.Events.onInput YearChanged
+            , step "any"
+            , Html.Events.onInput (YearChanged entry.id)
             ] [] ]
     , td []
         [ input
             [ type_ "number"
             , value entry.taxPaid
-            , Html.Events.onInput AmountChanged
+            , step "any"
+            , Html.Events.onInput (AmountChanged entry.id)
             ] []
         ]
     ]
 
 type Msg =
-  YearChanged String
-  | AmountChanged String
+  YearChanged Int String
+  | AmountChanged Int String
 
 update msg model =
   case msg of
-    YearChanged inputValue ->
-      model
-    AmountChanged inputValue ->
-      model
+    YearChanged id inputValue ->
+      let
+        updatedEntries = changeYear id inputValue model.entries
+        newStats = makeStats updatedEntries
+
+      in
+        { model | entries = updatedEntries, stats = newStats }
+
+    AmountChanged id inputValue ->
+      let
+        updatedEntries = changeAmount id inputValue model.entries
+        newStats = makeStats updatedEntries
+
+      in
+        { model | entries = updatedEntries, stats = newStats }
+
+changeYear : Int -> String -> List Entry -> List Entry
+changeYear id newYear entries =
+  List.map (\entry -> if entry.id == id then { entry | year = newYear } else entry) entries
+
+changeAmount : Int -> String -> List Entry -> List Entry
+changeAmount id newAmount entries =
+  List.map (\entry -> if entry.id == id then { entry | taxPaid = newAmount } else entry) entries
+
+makeStats : List Entry -> String
+makeStats entries =
+  "cool stats, bro"  
