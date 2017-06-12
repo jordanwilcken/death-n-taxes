@@ -11,8 +11,6 @@ type alias Model =
   , stats : String
   }
 
-type alias DataPoints = List TaxDataPoint
-
 type alias TaxDataPoint = { year : Int, taxPaid : Float }
 
 type alias Entry = { id: Int, year : String, taxPaid : String }
@@ -25,7 +23,7 @@ model =
     , Entry 4 "" ""
     , Entry 5 "" ""
     ]
-    "we don't have no stats yet"
+    ""
 
 view model =
   div []
@@ -101,4 +99,25 @@ changeAmount id newAmount entries =
 
 makeStats : List Entry -> String
 makeStats entries =
-  "cool stats, bro"  
+  case averageTaxPaid (getDataPoints entries) of
+    Err theMessage -> ""
+    Ok theAverage -> "On average, you pay $" ++ toString theAverage ++ " in taxes each year."
+
+averageTaxPaid : List TaxDataPoint -> Result String Float
+averageTaxPaid dataPoints =
+  let
+    pointCount = List.length dataPoints
+
+  in
+    if pointCount == 0 
+      then Err "Can't take an average without any real data"
+      else Ok (List.sum (List.map (\point -> point.taxPaid) dataPoints) / toFloat pointCount)
+
+getDataPoints : List Entry -> List TaxDataPoint
+getDataPoints entries =
+  List.filterMap entryToTaxDataPoint entries
+
+entryToTaxDataPoint : Entry -> Maybe TaxDataPoint
+entryToTaxDataPoint entry =
+  Result.toMaybe (Result.map2 TaxDataPoint (String.toInt entry.year) (String.toFloat entry.taxPaid))
+  
