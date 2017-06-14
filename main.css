@@ -1,4 +1,29 @@
 main {
   margin: auto;
   max-width: 50vw;
+  text-align: center;
+}
+
+th {
+  text-align: center;
+}
+
+td, th {
+  padding: 0.3em;
+}
+
+.year-input {
+  width: 5em;
+}
+
+.amount-column {
+  width: 7em;
+}
+
+#tax-table {
+  margin: auto;
+}
+
+#stats {
+  margin-top: 1em;
 }

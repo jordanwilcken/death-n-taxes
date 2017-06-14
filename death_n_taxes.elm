@@ -16,19 +16,22 @@ type alias TaxDataPoint = { year : Int, taxPaid : Float }
 type alias Entry = { id: Int, year : String, taxPaid : String }
 
 model =
-  Model
-    [ Entry 1 "" ""
-    , Entry 2 "" ""
-    , Entry 3 "" ""
-    , Entry 4 "" ""
-    , Entry 5 "" ""
-    ]
-    ""
+  let
+    entries =
+      [ Entry 1 "2013" "198.25"
+      , Entry 2 "2014" "-43.42"
+      , Entry 3 "2015" "1000.99"
+      , Entry 4 "2016" "-500"
+      , Entry 5 "2017" "0.01"
+      ]
+
+  in
+    Model entries (makeStats entries)
 
 view model =
   div []
-    [ table [] (makeRows model.entries)
-    , p [] [ text model.stats ]
+    [ table [ id "tax-table" ] (makeRows model.entries)
+    , p [ id "stats" ] [ text model.stats ]
     ]
 
 makeRows : List Entry -> List (Html Msg)
@@ -45,21 +48,23 @@ makeTaxRows entries =
 
 makeHeaderRow : Html msg
 makeHeaderRow =
-  tr [] [ th [] [ text "year"], th [] [text "federal income tax paid" ] ]
+  tr [] [ th [] [ text "year"], th [ class "amount-column" ] [text "federal income tax paid" ] ]
    
 makeOneRow : Entry -> Html Msg
 makeOneRow entry =
   tr []
     [ td []
         [ input
-            [ type_ "number"
+            [ class "year-input"
+            , type_ "number"
             , value entry.year
             , step "any"
             , Html.Events.onInput (YearChanged entry.id)
             ] [] ]
     , td []
         [ input
-            [ type_ "number"
+            [ class "amount-column"
+            , type_ "number"
             , value entry.taxPaid
             , step "any"
             , Html.Events.onInput (AmountChanged entry.id)
